@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
