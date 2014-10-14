@@ -37,27 +37,35 @@ public class Pawn extends Piece {
 	
 	public boolean isFirst() { return m_first; }
 	
+	public void move(int x, int y) {
+		super.move(x, y);
+		m_first = false;
+	}
+	
 	public boolean isPawn() { return true; }
 	
 	public boolean checkMove(Piece m_pieces[][], int x, int y) {
 		Color c = getColor();
-		if(x < 0 || x >= 8 || y > 0 || y >= 8) {
+		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
 			return false;
 		}
-		if(getY() != y) {
+		if(getX() != x) {
 			return false;
 		}
 		
 		if(m_first) {
-			if(c == Color.BLACK && (getX()+1 == x || getX()+2 == x)) {
+			if(c == Color.WHITE && (getY()+1 == y || getY()+2 == y)) {
 				return true;
 			}
-			if(c == Color.WHITE && (getX()-1 == x || getX()-2 == x)) {
+			if(c == Color.BLACK && (getY()-1 == y || getY()-2 == y)) {
 				return true;
 			}
 		}
 		else {
-			if(getX()+1 == x || getX()+2 == x) {
+			if(c == Color.WHITE && getY()+1 == y) {
+				return true;
+			}
+			if(c == Color.BLACK && getY()-1 == y) {
 				return true;
 			}
 		}

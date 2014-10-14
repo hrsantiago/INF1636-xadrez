@@ -1,7 +1,9 @@
 package view;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -48,11 +50,9 @@ public class BoardView extends JPanel {
 				int tileWidth = width / board.getWidth();
 				int tileHeight = height / board.getHeight();
 				
-				int i = (y - y0) / tileHeight;
-				int j = (x - x0) / tileWidth;
-				
-				System.out.println("Position (X,Y): " + j + " , " + i);
-				board.removePiece(i, j);
+				int tileX = (x - x0) / tileWidth;
+				int tileY = (y - y0) / tileHeight;				
+				board.processTileClick(tileX, tileY);
 			}
 			@Override
 			public void mouseEntered(MouseEvent arg0) {}
@@ -66,16 +66,11 @@ public class BoardView extends JPanel {
 		
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
-		board.connect("onPieceRemoved", this, "onPieceRemoved");
+		board.connect("onTileClicked", this, "onTileClicked");
 	}
 	
-	public void onPieceRemoved(int row, int column) {
-		System.out.println("Testing emitter class, onPieceRemoved" + row + " " + column);
+	public void onTileClicked(int x, int y) {
 		repaint();
-		
-		Game game = Game.getInstance();
-		Board board = game.getBoard();
-		board.disconnect("onPieceRemoved", this, "onPieceRemoved");
 	}
 
 	public void paintComponent(Graphics g) {
@@ -106,13 +101,40 @@ public class BoardView extends JPanel {
 			for(int j = 0; j < board.getWidth(); ++j) {
 				int x = x0 + j * tileWidth;
 				int y = y0 + i * tileHeight;
-				
 				g.setColor(((i+j) % 2) == 0 ? Color.WHITE : Color.BLACK);
 				g.fillRect(x, y, tileWidth, tileHeight);
-				
+			}
+		}
+		
+		paintPieces(g, board, x0, y0, tileWidth, tileHeight);
+	}
+	
+	private void paintPieces(Graphics g, Board board, int x0, int y0, int tileWidth, int tileHeight) {
+		Graphics2D g2 = (Graphics2D)g;
+		
+		int lw = 4;
+		
+		g2.setStroke(new BasicStroke(lw));
+		
+		Piece selectedPiece = board.getSelectedPiece();
+		for(int i = 0; i < board.getHeight(); ++i) {
+			for(int j = 0; j < board.getWidth(); ++j) {
+				int x = x0 + j * tileWidth;
+				int y = y0 + i * tileHeight;
 				Piece piece = board.getPiece(i, j);
-				if(piece != null)
+				if(piece != null) {
+					if(piece == selectedPiece) {
+						g2.setColor(Color.RED);
+						g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
+					}
+					
 					paintPiece(g, piece, x, y, tileWidth, tileHeight);
+				}
+				
+				if(selectedPiece != null && selectedPiece.checkMove(board.getPieces(), j, i)) {
+					g2.setColor(Color.YELLOW);
+					g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
+				}
 			}
 		}
 	}

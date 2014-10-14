@@ -9,7 +9,7 @@ public class King extends Piece {
 	public boolean isKing() { return true; }
 	
 	public boolean checkMove(Piece m_pieces[][],int x,int y) {
-		if(x < 0 || x >= 8 || y > 0 || y >= 8) {
+		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
 			return false;
 		}
 		if(getX()+1 < x || getX()-1 > x) {

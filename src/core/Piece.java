@@ -27,7 +27,7 @@ public abstract class Piece {
 	public Color getColor() {
 		return m_color;
 	}
-	public abstract boolean checkMove(Piece m_pieces[][],int x,int y);
+	public abstract boolean checkMove(Piece m_pieces[][], int x, int y);
 	
 	public int getX() {
 		return m_x;
@@ -35,5 +35,10 @@ public abstract class Piece {
 	
 	public int getY() {
 		return m_y;
+	}
+	
+	public void move(int x, int y) {
+		m_x = x;
+		m_y = y;
 	}
 }

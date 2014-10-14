@@ -7,6 +7,7 @@ public class Board extends Emitter {
 	private int m_width;
 	private int m_height;
 	private Piece m_pieces[][];
+	private Piece m_selectedPiece;
 	
 	public Board(int width, int height) {
 		m_width = width;
@@ -33,6 +34,8 @@ public class Board extends Emitter {
 			for(int j = 0; j < m_width; ++j)
 				m_pieces[pawnRow][j] = new Pawn(j, pawnRow, color);
 		}
+		
+		m_selectedPiece = null;
 	}
 	
 	public int getWidth() {
@@ -47,8 +50,44 @@ public class Board extends Emitter {
 		return m_pieces[row][column];
 	}
 	
-	public void removePiece(int row, int column) {
-		m_pieces[row][column] = null;
-		emit("onPieceRemoved", row, column);
+	public Piece[][] getPieces() {
+		return m_pieces;
+	}
+	
+	public Piece getSelectedPiece() {
+		return m_selectedPiece;
+	}
+	
+	public void processTileClick(int x, int y) {
+		if(m_selectedPiece == null) {
+			m_selectedPiece = m_pieces[y][x];
+		}
+		else {
+			if(m_selectedPiece.getX() != x || m_selectedPiece.getY() != y) {
+				Piece piece = m_pieces[y][x];
+				if(piece != null) {
+					if(piece.getColor() == m_selectedPiece.getColor())
+						m_selectedPiece = piece;
+					else if(!movePiece(m_selectedPiece, x, y))
+						m_selectedPiece = null;
+						
+				}
+				else if(!movePiece(m_selectedPiece, x, y))
+					m_selectedPiece = null;
+			}
+			else
+				m_selectedPiece = null;
+		}
+		emit("onTileClicked", x, y);
+	}
+	
+	public boolean movePiece(Piece piece, int x, int y) {
+		if(piece.checkMove(m_pieces, x, y)) {
+			m_pieces[piece.getY()][piece.getX()] = null;
+			m_pieces[y][x] = piece;
+			piece.move(x, y);
+			return true;
+		}
+		return false;
 	}
 }

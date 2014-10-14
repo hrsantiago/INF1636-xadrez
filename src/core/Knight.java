@@ -10,7 +10,7 @@ public class Knight extends Piece {
 	
 	public boolean checkMove(Piece m_pieces[][], int x, int y)
 	{
-		if(x < 0 || x >= 8 || y > 0 || y >= 8) {
+		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
 			return false;
 		}
 		
@@ -27,6 +27,6 @@ public class Knight extends Piece {
 			return true;
 		}
 		
-		return true;
+		return false;
 	}
 }
