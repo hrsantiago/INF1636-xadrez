@@ -13,13 +13,11 @@ public class Bishop extends Piece {
 		if(x < 0 || x >= 8 || y > 0 || y >= 8) {
 			return false;
 		}
-		if(getX()==x||getY()==y)
-		{
+		if(getX() == x || getY() == y) {
 			return false;
 		}
-		if(Math.abs(getX()-x)==Math.abs(getY()-y))
-		{
-		return true;
+		if(Math.abs(getX()-x) == Math.abs(getY()-y)) {
+			return true;
 		}
 		return false;
 	}

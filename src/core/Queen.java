@@ -16,13 +16,11 @@ public class Queen extends Piece {
 		if(getX() == x && getY() != y || getY() == y && getX() != x) {
 			return true;
 		}
-		if(getX()==x||getY()==y)
-		{
+		if(getX() == x || getY() == y) {
 			return false;
 		}
-		if(Math.abs(getX()-x)==Math.abs(getY()-y))
-		{
-		return true;
+		if(Math.abs(getX()-x) == Math.abs(getY()-y)) {
+			return true;
 		}
 		return false;
 	}
