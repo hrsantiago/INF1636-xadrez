@@ -66,6 +66,7 @@ public class BoardView extends JPanel {
 		
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
+		
 		try {
 			board.connect("onPieceRemoved", this, BoardView.class.getMethod("onPieceRemoved", new Class[]{int.class, int.class}));
 		} catch (NoSuchMethodException | SecurityException e) {
@@ -107,6 +108,7 @@ public class BoardView extends JPanel {
 			for(int j = 0; j < board.getWidth(); ++j) {
 				int x = x0 + j * tileWidth;
 				int y = y0 + i * tileHeight;
+				
 				g.setColor(((i+j) % 2) == 0 ? Color.WHITE : Color.BLACK);
 				g.fillRect(x, y, tileWidth, tileHeight);
 				

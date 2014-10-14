@@ -16,22 +16,22 @@ public class Board extends Emitter {
 	}
 	
 	public void initialize() {
-		for(int k = 0; k < m_height; k+=m_height-1) {
+		for(int i = 0; i < m_height; i+=m_height-1) {
 			Piece.Color color = Color.BLACK;
-			if(k == 0)
+			if(i == 0)
 				color = Color.WHITE;
-			m_pieces[k][0] = new Rook(k, 0, color);
-			m_pieces[k][1] = new Knight(k, 1, color);
-			m_pieces[k][2] = new Bishop(k, 2, color);
-			m_pieces[k][3] = new King(k, 3, color);
-			m_pieces[k][4] = new Queen(k, 4, color);
-			m_pieces[k][5] = new Bishop(k, 5, color);
-			m_pieces[k][6] = new Knight(k, 6, color);
-			m_pieces[k][7] = new Rook(k, 7, color);
+			m_pieces[i][0] = new Rook(0, i, color);
+			m_pieces[i][1] = new Knight(1, i, color);
+			m_pieces[i][2] = new Bishop(2, i, color);
+			m_pieces[i][3] = new King(3, i, color);
+			m_pieces[i][4] = new Queen(4, i, color);
+			m_pieces[i][5] = new Bishop(5, i, color);
+			m_pieces[i][6] = new Knight(6, i, color);
+			m_pieces[i][7] = new Rook(7, i, color);
 			
-			int i = (k == 0) ? 1 : m_height - 2;
+			int pawnRow = (i == 0) ? 1 : m_height - 2;
 			for(int j = 0; j < m_width; ++j)
-				m_pieces[i][j] = new Pawn(i, j, color);
+				m_pieces[pawnRow][j] = new Pawn(j, pawnRow, color);
 		}
 	}
 	
