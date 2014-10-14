@@ -1,8 +1,9 @@
 package core;
 
+import util.Emitter;
 import core.Piece.Color;
 
-public class Board {
+public class Board extends Emitter {
 	private int m_width;
 	private int m_height;
 	private Piece m_pieces[][];
@@ -16,9 +17,9 @@ public class Board {
 	
 	public void initialize() {
 		for(int k = 0; k < m_height; k+=m_height-1) {
-			Piece.Color color = Color.BLACK;
+			Piece.Color color = Color.WHITE;
 			if(k == 0)
-				color = Color.WHITE;
+				color = Color.BLACK;
 			m_pieces[k][0] = new Rook(color);
 			m_pieces[k][1] = new Knight(color);
 			m_pieces[k][2] = new Bishop(color);
@@ -44,5 +45,10 @@ public class Board {
 	
 	public Piece getPiece(int row, int column) {
 		return m_pieces[row][column];
+	}
+	
+	public void removePiece(int row, int column) {
+		m_pieces[row][column] = null;
+		emit("onPieceRemoved", row, column);
 	}
 }
