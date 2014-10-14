@@ -2,8 +2,8 @@ package core;
 
 public class Bishop extends Piece {
 	
-	public Bishop(int x, int j, Color color) {
-		super(x, j, color);
+	public Bishop(int x, int y, Color color) {
+		super(x, y, color);
 	}
 
 	public boolean isBishop() { return true; }
