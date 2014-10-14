@@ -45,10 +45,29 @@ public class Pawn extends Piece {
 	public boolean isPawn() { return true; }
 	
 	public boolean checkMove(Piece m_pieces[][], int x, int y) {
+		//TODO: Manobra Passent, movimento diagonal bugado
 		Color c = getColor();
 		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
 			return false;
 		}
+		
+		if(m_pieces[x][y]!=null){
+		if(getX()+1==x||getX()-1==x){
+			if(c == Color.WHITE&&getY()+1==y){
+				
+				if(m_pieces[x][y].getColor()==Color.BLACK){
+					return true;
+				}
+				
+			}
+				if(c == Color.BLACK&&getY()-1==y){
+					if(m_pieces[x][y].getColor()==Color.WHITE){
+						return true;
+					}
+			}
+		}
+		}
+		
 		if(getX() != x) {
 			return false;
 		}

@@ -8,6 +8,79 @@ public class King extends Piece {
 	
 	public boolean isKing() { return true; }
 	
+	public boolean isChecked(Piece m_pieces[][]){
+		//TODO: preencher todos as possibilidades(os 3 casos)
+		
+		//caso do peão
+		if(getX()==0){ //lado esquerdo		
+			if(getColor()==Color.BLACK&&m_pieces[0][getY()+1]!=null){
+			if(m_pieces[1][getY()+1].isPawn()==true&&m_pieces[1][getY()+1].getColor()==Color.WHITE){
+				
+				return true;
+			}
+			}
+			if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
+				if(m_pieces[1][getY()-1].isPawn()==true&&m_pieces[1][getY()-1].getColor()==Color.WHITE){
+					
+					return true;
+				}
+			}
+		}
+		if(getX()==7){//lado direito
+			if(getColor()==Color.BLACK&&m_pieces[0][getY()+1]!=null){
+				if(m_pieces[6][getY()+1].isPawn()==true&&m_pieces[6][getY()+1].getColor()==Color.WHITE){
+					
+					return true;
+				}
+				}
+				if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
+					if(m_pieces[6][getY()-1].isPawn()==true&&m_pieces[6][getY()-1].getColor()==Color.WHITE){
+						
+						return true;
+					}
+				}
+		}
+		
+		if(getColor()==Color.BLACK){
+			if(m_pieces[getX()-1][getY()-1]!=null){ //Centro
+		
+				if(m_pieces[getX()-1][getY()-1].isPawn()==true&&m_pieces[getX()][getY()-1].getColor()==Color.WHITE){
+				
+				return true;
+				}
+			}
+			if(m_pieces[getX()+1][getY()-1]!=null){
+				if(m_pieces[getX()+1][getY()-1].isPawn()==true&&m_pieces[getX()][getY()-1].getColor()==Color.WHITE){
+				
+				return true;
+				}
+			}
+		}
+		if(getColor()==Color.WHITE){
+			if(m_pieces[getX()+1][getY()+1]!=null){
+		
+				if(m_pieces[getX()+1][getY()+1].isPawn()==true&&m_pieces[getX()+1][getY()+1].getColor()==Color.BLACK){
+					
+					return true;
+				}
+			}
+			if(m_pieces[getX()-1][getY()+1]!=null){
+				if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
+					if(m_pieces[getX()-1][getY()+1].isPawn()==true&&m_pieces[getX()-1][getY()+1].getColor()==Color.BLACK){
+						
+						return true;
+					}
+			}
+			}
+		}
+		//caso do cavalo
+		
+		
+		//outros casos
+		
+		return false;
+	}
+	
 	public boolean checkMove(Piece m_pieces[][],int x,int y) {
 		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
 			return false;
