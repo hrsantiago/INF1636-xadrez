@@ -1,0 +1,4 @@
+# Normalize source code before commits
+*.java eol=lf
+*.txt  eol=lf
+*.md   eol=lf
