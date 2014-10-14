@@ -1,4 +1,5 @@
 package util;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -8,16 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 class Connection {
-	private Object m_receiver;
+	private WeakReference<Object> m_receiver;
 	private Method m_slot;
 	
 	public Connection(Object receiver, Method slot) {
-		m_receiver = receiver;
+		m_receiver = new WeakReference<Object>(receiver);
 		m_slot = slot;
 	}
 
 	public Object getReceiver() {
-		return m_receiver;
+		return m_receiver.get();
 	}
 	
 	public Method getSlot() {
@@ -36,8 +37,34 @@ public abstract class Emitter {
 		m_connections.put(signal, connections);
 	}
 	
-	public void disconnect(String signal, Object receiver, Method slot) {
-		
+	public void connect(String signal, Object receiver, String methodName, Class<?>[] methodClasses) {
+		try {
+			connect(signal, receiver, receiver.getClass().getMethod(methodName, methodClasses));
+		} catch (NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void connect(String signal, Object receiver, String methodName) {
+		Method[] methods = receiver.getClass().getDeclaredMethods();
+		for(Method m : methods) {
+			if(m.getName().equals(methodName)) {
+				connect(signal, receiver, m);
+				break;
+			}			
+		}
+	}
+
+	public void disconnect(String signal, Object receiver, String methodName) {
+		List<Connection> connections = m_connections.get(signal);
+		if(connections != null) {
+			Iterator<Connection> iterator = connections.iterator();
+			while(iterator.hasNext()) {
+				Connection connection = iterator.next();
+				if(connection.getReceiver() == null || (connection.getReceiver() == receiver && connection.getSlot().getName() == methodName))
+					iterator.remove();
+			}
+		}
 	}
 	
 	protected void emit(String signal, Object... args) {
@@ -46,14 +73,17 @@ public abstract class Emitter {
 			Iterator<Connection> iterator = connections.iterator();
 			while(iterator.hasNext()) {
 				Connection connection = iterator.next();
-				Method slot = connection.getSlot();
 				Object receiver = connection.getReceiver();
-				try {
-					slot.invoke(receiver, args);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(receiver != null) {
+					Method slot = connection.getSlot();
+					try {
+						slot.invoke(receiver, args);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
 				}
+				else
+					iterator.remove();
 			}
 		}
 	}

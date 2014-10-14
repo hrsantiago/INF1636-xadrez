@@ -66,18 +66,16 @@ public class BoardView extends JPanel {
 		
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
-		
-		try {
-			board.connect("onPieceRemoved", this, BoardView.class.getMethod("onPieceRemoved", new Class[]{int.class, int.class}));
-		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		board.connect("onPieceRemoved", this, "onPieceRemoved");
 	}
 	
 	public void onPieceRemoved(int row, int column) {
 		System.out.println("Testing emitter class, onPieceRemoved" + row + " " + column);
 		repaint();
+		
+		Game game = Game.getInstance();
+		Board board = game.getBoard();
+		board.disconnect("onPieceRemoved", this, "onPieceRemoved");
 	}
 
 	public void paintComponent(Graphics g) {
