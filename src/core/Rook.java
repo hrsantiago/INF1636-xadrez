@@ -8,14 +8,18 @@ public class Rook extends Piece {
 	
 	public boolean isRook() { return true; }
 	
-	public boolean checkMove(Piece m_pieces[][], int x, int y)
+	public boolean checkMove(Piece pieces[][], int x, int y)
 	{
-		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
+		if(!super.checkMove(pieces, x, y))
 			return false;
-		}
-		if(getX() == x && getY() != y || getY() == y && getX() != x) {
+		
+		Piece otherPiece = pieces[y][x];
+		if(otherPiece != null && otherPiece.getColor() == m_color)
+			return false;
+
+		if(getX() == x && getY() != y || getY() == y && getX() != x)
 			return true;
-		}
+
 		return false;
 	}
 }

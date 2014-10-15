@@ -2,7 +2,7 @@ package core;
 
 public class Game {
 	private static Game m_instance = null;
-	private boolean m_playerBlackTurn=true;//Começa com o jogador das peças pretas.
+	private boolean m_playerBlackTurn=false;
 	
 	private Board m_board;
 	
@@ -19,7 +19,8 @@ public class Game {
 	public Board getBoard() {
 		return m_board;
 	}
-	public boolean isPlayerBlackTurn() {//verdadeiro se fora  vez do jogador preto e falso se for o jogador branco
+	
+	public boolean isPlayerBlackTurn() {
 		return m_playerBlackTurn;
 	}
 }

@@ -8,102 +8,29 @@ public class King extends Piece {
 	
 	public boolean isKing() { return true; }
 	
-	public boolean isChecked(Piece m_pieces[][]){
-		//TODO: preencher todos as possibilidades(os 3 casos)
-		
-		//caso do peão
-		if(getX()==0){ //lado esquerdo		
-			if(getColor()==Color.BLACK&&m_pieces[0][getY()+1]!=null){
-			if(m_pieces[1][getY()+1].isPawn()==true&&m_pieces[1][getY()+1].getColor()==Color.WHITE){
-				
-				return true;
-			}
-			}
-			if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
-				if(m_pieces[1][getY()-1].isPawn()==true&&m_pieces[1][getY()-1].getColor()==Color.WHITE){
-					
-					return true;
-				}
-			}
-		}
-		if(getX()==7){//lado direito
-			if(getColor()==Color.BLACK&&m_pieces[0][getY()+1]!=null){
-				if(m_pieces[6][getY()+1].isPawn()==true&&m_pieces[6][getY()+1].getColor()==Color.WHITE){
-					
-					return true;
-				}
-				}
-				if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
-					if(m_pieces[6][getY()-1].isPawn()==true&&m_pieces[6][getY()-1].getColor()==Color.WHITE){
-						
-						return true;
-					}
-				}
-		}
-		
-		if(getColor()==Color.BLACK){
-			if(m_pieces[getX()-1][getY()-1]!=null){ //Centro
-		
-				if(m_pieces[getX()-1][getY()-1].isPawn()==true&&m_pieces[getX()][getY()-1].getColor()==Color.WHITE){
-				
-				return true;
-				}
-			}
-			if(m_pieces[getX()+1][getY()-1]!=null){
-				if(m_pieces[getX()+1][getY()-1].isPawn()==true&&m_pieces[getX()][getY()-1].getColor()==Color.WHITE){
-				
-				return true;
-				}
-			}
-		}
-		if(getColor()==Color.WHITE){
-			if(m_pieces[getX()+1][getY()+1]!=null){
-		
-				if(m_pieces[getX()+1][getY()+1].isPawn()==true&&m_pieces[getX()+1][getY()+1].getColor()==Color.BLACK){
-					
-					return true;
-				}
-			}
-			if(m_pieces[getX()-1][getY()+1]!=null){
-				if(getColor()==Color.WHITE&&m_pieces[1][getY()+1]!=null){
-					if(m_pieces[getX()-1][getY()+1].isPawn()==true&&m_pieces[getX()-1][getY()+1].getColor()==Color.BLACK){
-						
-						return true;
-					}
-			}
-			}
-		}
-		//caso do cavalo
-		
-		
-		//outros casos
-		
-		return false;
-	}
-	
-	public boolean checkMove(Piece m_pieces[][],int x,int y) {
-		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
+	public boolean checkMove(Piece pieces[][], int x, int y) {
+		if(!super.checkMove(pieces, x, y))
 			return false;
-		}
-		if(getX()+1 < x || getX()-1 > x) {
-			return false;
-		}
-		if(getY()+1 < y || getY()-1 > y) {
-			return false;
+		
+		Piece otherPiece = pieces[y][x];
+		if(otherPiece != null) {
+			 if(otherPiece.getColor() == m_color)
+				 return false;
+			 if(otherPiece.isKing())
+				 return false;
 		}
 		
-		if(getX() == x && (getY()+1 < y || getY()-1 > y)) { //Ultrapassa Lados?
+		if(Math.abs(m_x-x) > 1 || Math.abs(m_y-y) > 1)
 			return false;
-		}
-		if(getY() == y && (getX()+1 < x || getX()-1 > x)) { //Ultrapassa  Cima e baixo?
+		
+		Game game = Game.getInstance();
+		Board board = game.getBoard();
+		
+		System.out.println(x + " " + y);
+		
+		// This function is slow, so it should be the last check.
+		if(board.isTileChecked(x, y, getEnemyColor(), this))
 			return false;
-		}
-		if(getX()+1 == y && (getY()+1 < y || getY()-1 > y)) { //Ultrapassa inclinados direita?
-			return false;
-		}
-		if(getX()-1 == y && (getY()+1 < y || getY()-1 > y)) { //Ultrapassa inclinados esquerda?
-			return false;
-		}
 
 		return true;
 	}

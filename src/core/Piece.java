@@ -7,9 +7,9 @@ public abstract class Piece {
 		BLACK,
 	}
 	
-	private int m_x;
-	private int m_y;
-	private Color m_color;
+	protected int m_x;
+	protected int m_y;
+	protected Color m_color;
 
 	public Piece(int x, int y, Color color) {
 		m_x = x;
@@ -24,10 +24,32 @@ public abstract class Piece {
 	public boolean isRook() { return false; }
 	public boolean isPawn() { return false; }
 	
+	public boolean isChecked() {
+		Game game = Game.getInstance();
+		Board board = game.getBoard();
+		return board.isTileChecked(m_x, m_y, getEnemyColor(), this);
+	}
+	
 	public Color getColor() {
 		return m_color;
 	}
-	public abstract boolean checkMove(Piece m_pieces[][], int x, int y);
+	
+	public Color getEnemyColor() {
+		if(m_color == Color.WHITE)
+			return Color.BLACK;
+		else
+			return Color.WHITE;
+	}
+	
+	public boolean checkMove(Piece pieces[][], int x, int y) {
+		if(x < 0 || x >= 8 || y < 0 || y >= 8)
+			return false;
+		
+		if(m_x == x && m_y == y)
+			return false;
+		
+		return true;
+	}
 	
 	public int getX() {
 		return m_x;

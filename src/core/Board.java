@@ -47,6 +47,8 @@ public class Board extends Emitter {
 	}
 	
 	public Piece getPiece(int row, int column) {
+		if(column < 0 || column >= m_width || row < 0 || row >= m_height)
+			return null;
 		return m_pieces[row][column];
 	}
 	
@@ -87,6 +89,25 @@ public class Board extends Emitter {
 			m_pieces[y][x] = piece;
 			piece.move(x, y);
 			return true;
+		}
+		return false;
+	}
+	
+	public boolean isTileChecked(int x, int y, Color checkerColor, Piece callerPiece) {
+		for(int i = 0; i < m_height; ++i) {
+			for(int j = 0; j < m_width; ++j) {
+				Piece piece = m_pieces[i][j];
+				if(piece != null && piece.getColor() == checkerColor) {
+					// Kings can't check themselves
+					if(callerPiece != null && callerPiece.isKing() && piece.isKing()) {
+						if(Math.abs(piece.getX()-x) <= 1 && Math.abs(callerPiece.getX()-x) <= 1 && 
+						   Math.abs(piece.getY()-y) <= 1 && Math.abs(callerPiece.getY()-y) <= 1)
+						return true;
+					}
+					else if(piece.checkMove(m_pieces, x, y))
+						return true;
+				}
+			}
 		}
 		return false;
 	}

@@ -7,18 +7,17 @@ public class Bishop extends Piece {
 	}
 
 	public boolean isBishop() { return true; }
-	public boolean checkMove(Piece m_pieces[][], int x, int y) {
-		//TODO: fazer a checagem de movimento do bispo
+	public boolean checkMove(Piece pieces[][], int x, int y) {
+		if(!super.checkMove(pieces, x, y))
+			return false;
 		
-		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
+		Piece otherPiece = pieces[y][x];
+		if(otherPiece != null && otherPiece.getColor() == m_color)
 			return false;
-		}
-		if(getX() == x || getY() == y) {
+		
+		if(Math.abs(getX()-x) != Math.abs(getY()-y))
 			return false;
-		}
-		if(Math.abs(getX()-x) == Math.abs(getY()-y)) {
-			return true;
-		}
-		return false;
+
+		return true;
 	}
 }

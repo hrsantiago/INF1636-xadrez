@@ -8,24 +8,19 @@ public class Knight extends Piece {
 	
 	public boolean isKnight() { return true; }
 	
-	public boolean checkMove(Piece m_pieces[][], int x, int y)
+	public boolean checkMove(Piece pieces[][], int x, int y)
 	{
-		if(x < 0 || x >= 8 || y < 0 || y >= 8) {
+		if(!super.checkMove(pieces, x, y))
 			return false;
-		}
 		
-		if(getX()+2 == x && (getY()+1 == y || getY()-1 == y)) { //direita 1
+		Piece otherPiece = pieces[y][x];
+		if(otherPiece != null && otherPiece.getColor() == m_color)
+			return false;
+		
+		if(Math.abs(m_x - x) == 2 && Math.abs(m_y - y) == 1)
 			return true;
-		}
-		if(getX()+1 == x && (getY()+2 == y || getY()-2 == y)) { //direita 2
+		if(Math.abs(m_x - x) == 1 && Math.abs(m_y - y) == 2)
 			return true;
-		}
-		if(getX()-2 == x && (getY()+1 == y || getY()-1 == y)) { //esquerda 1
-			return true;
-		}
-		if(getX()-1 == x && (getY()+2 == y || getY()-2 == y)) { //esquerda 2
-			return true;
-		}
 		
 		return false;
 	}
