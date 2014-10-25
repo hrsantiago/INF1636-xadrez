@@ -18,7 +18,6 @@ public class Rook extends Piece {
 		if (otherPiece != null && otherPiece.getColor() == m_color)
 			return false;
 
-<<<<<<< HEAD
 		if (getX() == x && getY() != y) {
 
 			if (y > getY()) {
@@ -30,30 +29,11 @@ public class Rook extends Piece {
 			} else {
 				for (int i = getY() - 1; i > y; i--) {
 					if (pieces[i][x] != null) {
-=======
-		if(getX() == x && getY() != y){
-			
-			if(y>getY()){
-			for(int i=getY()+1;i<y;i++)
-			{
-				if(pieces[i][x]!=null)
-				{
-					return false;
-				}
-			}
-			}
-			else{
-				for(int i=getY()-1;i>y;i--)
-				{
-					if(pieces[i][x]!=null)
-					{
->>>>>>> origin/master
 						return false;
 					}
 				}
 			}
 			return true;
-<<<<<<< HEAD
 		}
 		if (getY() == y && getX() != x) {
 			if (x > getX()) {
@@ -69,28 +49,6 @@ public class Rook extends Piece {
 					}
 				}
 			}
-=======
-		}	
-		if(getY() == y && getX() != x){
-			if(x>getX()){
-				for(int i=getX()+1;i<x;i++)
-				{
-					if(pieces[y][i]!=null)
-					{
-						return false;
-					}
-				}
-				}
-				else{
-					for(int i=getX()-1;i>x;i--)
-					{
-						if(pieces[y][i]!=null)
-						{
-							return false;
-						}
-					}
-				}
->>>>>>> origin/master
 			return true;
 		}
 		return false;
