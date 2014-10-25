@@ -9,9 +9,9 @@ public class Pawn extends Piece {
 	}
 
 	public boolean isPromotion() {
-		if (getColor() == Color.BLACK && getX() == 0)
+		if (getColor() == Color.WHITE && getX() == 0)
 			return true;
-		else if (getColor() == Color.WHITE && getX() == 7)
+		else if (getColor() == Color.BLACK && getX() == 7)
 			return true;
 		return false;
 	}
@@ -51,9 +51,9 @@ public class Pawn extends Piece {
 		if (otherPiece != null) {
 			if (m_color != otherPiece.getColor()) {
 				if (getX() + 1 == x || getX() - 1 == x) {
-					if (m_color == Color.WHITE && getY() + 1 == y)
+					if (m_color == Color.BLACK && getY() + 1 == y)
 						return true;
-					if (m_color == Color.BLACK && getY() - 1 == y)
+					if (m_color == Color.WHITE && getY() - 1 == y)
 						return true;
 				}
 			} else
@@ -65,7 +65,7 @@ public class Pawn extends Piece {
 				return false;
 
 			if (m_first) {
-				if (m_color == Color.WHITE) {
+				if (m_color == Color.BLACK) {
 					if (getY() + 1 == y) {
 						return true;
 
@@ -77,7 +77,7 @@ public class Pawn extends Piece {
 						}
 					}
 				}
-				if (m_color == Color.BLACK) {
+				if (m_color == Color.WHITE) {
 					if (getY() - 1 == y) {
 						return true;
 
@@ -90,9 +90,9 @@ public class Pawn extends Piece {
 					}
 				}
 			} else {
-				if (m_color == Color.WHITE && getY() + 1 == y)
+				if (m_color == Color.BLACK && getY() + 1 == y)
 					return true;
-				if (m_color == Color.BLACK && getY() - 1 == y)
+				if (m_color == Color.WHITE && getY() - 1 == y)
 					return true;
 			}
 

@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -21,6 +23,7 @@ public class BoardView extends JPanel {
 
 	private static final long serialVersionUID = -8326868557052884988L;
 	private boolean m_keepAspectRatio = true;
+	private Map<String, Image> m_images;
 	
 	public BoardView() {
 		addMouseListener(new MouseListener() {
@@ -64,9 +67,23 @@ public class BoardView extends JPanel {
 			public void mouseReleased(MouseEvent arg0) {}
 		});
 		
+		m_images = new HashMap<String, Image>();
+		
+		Game game = Game.getInstance();
+		game.connect("onCreate", this, "onGameCreated");
+		game.connect("onUnserialize", this, "onGameUnserialize");
+		onGameCreated();
+	}
+	
+	public void onGameCreated() {
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
 		board.connect("onTileClicked", this, "onTileClicked");
+		repaint();
+	}
+	
+	public void onGameUnserialize() {
+		repaint();
 	}
 	
 	public void onTileClicked(int x, int y) {
@@ -122,25 +139,24 @@ public class BoardView extends JPanel {
 				int x = x0 + j * tileWidth;
 				int y = y0 + i * tileHeight;
 				Piece piece = board.getPiece(i, j);
-				if(piece != null) {
-					if(piece == selectedPiece) {
-						g2.setColor(Color.RED);
-						g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
-					}
-					
-					paintPiece(g, piece, x, y, tileWidth, tileHeight);
-				}
 				
 				if(selectedPiece != null && selectedPiece.checkMove(board.getPieces(), j, i)) {
 					g2.setColor(Color.YELLOW);
 					g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
+				}
+				
+				if(piece != null) {
+					if(piece == selectedPiece) {
+						g2.setColor(Color.RED);
+						g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
+					}	
+					paintPiece(g, piece, x, y, tileWidth, tileHeight);
 				}
 			}
 		}
 	}
 	
 	private void paintPiece(Graphics g, Piece piece, int x, int y, int w, int h) {
-		// TODO: cache image
 		try {
 			String source = "assets/images/";
 			
@@ -162,7 +178,11 @@ public class BoardView extends JPanel {
 			else if(piece.isPawn())
 				source += "peao.gif";
 			
-			Image image = ImageIO.read(new File(source));
+			Image image = m_images.get(source);
+			if(image == null) {
+				image = ImageIO.read(new File(source));
+				m_images.put(source, image);
+			}
 			g.drawImage(image, x, y, w, h, null);
 		}
 		catch(IOException e) {

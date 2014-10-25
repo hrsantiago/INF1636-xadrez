@@ -1,5 +1,9 @@
 package core;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import util.Emitter;
 import core.Piece.Color;
 
@@ -18,14 +22,14 @@ public class Board extends Emitter {
 	
 	public void initialize() {
 		for(int i = 0; i < m_height; i+=m_height-1) {
-			Piece.Color color = Color.BLACK;
+			Piece.Color color = Color.WHITE;
 			if(i == 0)
-				color = Color.WHITE;
+				color = Color.BLACK;
 			m_pieces[i][0] = new Rook(0, i, color);
 			m_pieces[i][1] = new Knight(1, i, color);
 			m_pieces[i][2] = new Bishop(2, i, color);
-			m_pieces[i][3] = new King(3, i, color);
-			m_pieces[i][4] = new Queen(4, i, color);
+			m_pieces[i][3] = new Queen(3, i, color);
+			m_pieces[i][4] = new King(4, i, color);
 			m_pieces[i][5] = new Bishop(5, i, color);
 			m_pieces[i][6] = new Knight(6, i, color);
 			m_pieces[i][7] = new Rook(7, i, color);
@@ -36,6 +40,72 @@ public class Board extends Emitter {
 		}
 		
 		m_selectedPiece = null;
+	}
+	
+	public void serialize(FileOutputStream out) throws IOException {
+		for(int i = 0; i < m_height; ++i) {
+			for(int j = 0; j < m_width; ++j) {
+				Piece piece = m_pieces[i][j];
+				if(piece != null) {
+					Piece.Color color = piece.getColor();
+					out.write(1);
+					out.write(j);
+					out.write(i);
+					out.write(color == Piece.Color.WHITE ? 0 : 1);
+					
+					if(piece.isPawn())
+						out.write(0);
+					else if(piece.isRook())
+						out.write(1);
+					else if(piece.isKnight())
+						out.write(2);
+					else if(piece.isBishop())
+						out.write(3);
+					else if(piece.isQueen())
+						out.write(4);
+					else if(piece.isKing())
+						out.write(5);
+					else
+						throw new IOException("Board is corrupted");
+				}
+			}
+		}
+		out.write(0);
+	}
+	
+	public void unserialize(FileInputStream in) throws IOException {
+		m_pieces = new Piece[m_height][m_width];
+		
+		int code;
+		while((code = in.read()) != -1) {
+			if(code == 0)
+				break;
+			else if(code == 1) {
+				int x = in.read();
+				int y = in.read();
+				int colorCode = in.read();
+				int pieceCode = in.read();
+				
+				Piece.Color color = (colorCode == 0) ? Piece.Color.WHITE : Piece.Color.BLACK;
+				Piece piece = null;
+				if(pieceCode == 0)
+					piece = new Pawn(x, y, color);
+				else if(pieceCode == 1)
+					piece = new Rook(x, y, color);
+				else if(pieceCode == 2)
+					piece = new Knight(x, y, color);
+				else if(pieceCode == 3)
+					piece = new Bishop(x, y, color);
+				else if(pieceCode == 4)
+					piece = new Queen(x, y, color);
+				else if(pieceCode == 5)
+					piece = new King(x, y, color);
+				else
+					throw new IOException("File is corrupted");
+				
+				m_pieces[y][x] = piece;
+			}
+		}
 	}
 	
 	public int getWidth() {
