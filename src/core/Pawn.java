@@ -8,25 +8,12 @@ public class Pawn extends Piece {
 		super(x, y, color);
 	}
 
-	public boolean isPromotion() {
-		if (getColor() == Color.WHITE && getX() == 0)
+	public boolean canPromote() {
+		if (getColor() == Color.WHITE && getY() == 0)
 			return true;
-		else if (getColor() == Color.BLACK && getX() == 7)
+		else if (getColor() == Color.BLACK && getY() == 7)
 			return true;
 		return false;
-	}
-
-	public Piece promotion(String s) {
-		Piece p = null;
-		if (s.compareTo("Queen") == 0)
-			p = new Queen(getX(), getY(), getColor());
-		else if (s.compareTo("Rook") == 0)
-			p = new Rook(getX(), getY(), getColor());
-		else if (s.compareTo("Knight") == 0)
-			p = new Knight(getX(), getY(), getColor());
-		else if (s.compareTo("Bishop") == 0)
-			p = new Bishop(getX(), getY(), getColor());
-		return p;
 	}
 
 	public boolean isFirst() {
@@ -47,56 +34,68 @@ public class Pawn extends Piece {
 		if (!super.checkMove(pieces, x, y))
 			return false;
 
+		if (getX() != x)
+			return false;
+		
 		Piece otherPiece = pieces[y][x];
-		if (otherPiece != null) {
-			if (m_color != otherPiece.getColor()) {
-				if (getX() + 1 == x || getX() - 1 == x) {
-					if (m_color == Color.BLACK && getY() + 1 == y)
-						return true;
-					if (m_color == Color.WHITE && getY() - 1 == y)
-						return true;
-				}
-			} else
-				return false;
-		}
+		if (otherPiece != null)
+			return false;
 
-		else {
-			if (getX() != x)
-				return false;
+		if (m_first) {
+			if (m_color == Color.BLACK) {
+				if (getY() + 1 == y) {
+					return true;
 
-			if (m_first) {
-				if (m_color == Color.BLACK) {
-					if (getY() + 1 == y) {
+				} else if (getY() + 2 == y) {
+					if (pieces[y - 1][x] != null) {
+						return false;
+					} else {
 						return true;
-
-					} else if (getY() + 2 == y) {
-						if (pieces[y - 1][x] != null) {
-							return false;
-						} else {
-							return true;
-						}
 					}
 				}
-				if (m_color == Color.WHITE) {
-					if (getY() - 1 == y) {
-						return true;
-
-					} else if (getY() - 2 == y) {
-						if (pieces[y + 1][x] != null) {
-							return false;
-						} else {
-							return true;
-						}
-					}
-				}
-			} else {
-				if (m_color == Color.BLACK && getY() + 1 == y)
-					return true;
-				if (m_color == Color.WHITE && getY() - 1 == y)
-					return true;
 			}
+			if (m_color == Color.WHITE) {
+				if (getY() - 1 == y) {
+					return true;
 
+				} else if (getY() - 2 == y) {
+					if (pieces[y + 1][x] != null) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}
+		} else {
+			if (m_color == Color.BLACK && getY() + 1 == y)
+				return true;
+			if (m_color == Color.WHITE && getY() - 1 == y)
+				return true;
 		}
 		return false;
+	}
+
+	public boolean checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) {
+		if (!super.checkMove(pieces, x, y))
+			return false;
+		
+		if (m_color == Color.BLACK && getY() + 1 != y)
+			return false;
+		if (m_color == Color.WHITE && getY() - 1 != y)
+			return false;
+		
+		if (Math.abs(m_x - x) != 1)
+			return false;
+
+		if(!ignorePiece) {
+			Piece otherPiece = pieces[y][x];
+			if (otherPiece == null)
+				return false;
+	
+			if (m_color == otherPiece.getColor())
+				return false;
+		}
+
+		return true;
 	}
 }

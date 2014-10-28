@@ -19,18 +19,15 @@ public class Rook extends Piece {
 			return false;
 
 		if (getX() == x && getY() != y) {
-
 			if (y > getY()) {
 				for (int i = getY() + 1; i < y; i++) {
-					if (pieces[i][x] != null) {
+					if (pieces[i][x] != null)
 						return false;
-					}
 				}
 			} else {
 				for (int i = getY() - 1; i > y; i--) {
-					if (pieces[i][x] != null) {
+					if (pieces[i][x] != null)
 						return false;
-					}
 				}
 			}
 			return true;
@@ -38,15 +35,13 @@ public class Rook extends Piece {
 		if (getY() == y && getX() != x) {
 			if (x > getX()) {
 				for (int i = getX() + 1; i < x; i++) {
-					if (pieces[y][i] != null) {
+					if (pieces[y][i] != null)
 						return false;
-					}
 				}
 			} else {
 				for (int i = getX() - 1; i > x; i--) {
-					if (pieces[y][i] != null) {
+					if (pieces[y][i] != null)
 						return false;
-					}
 				}
 			}
 			return true;

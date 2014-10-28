@@ -28,8 +28,6 @@ public class King extends Piece {
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
 
-		System.out.println(x + " " + y);
-
 		// This function is slow, so it should be the last check.
 		if (board.isTileChecked(x, y, getEnemyColor(), this))
 			return false;

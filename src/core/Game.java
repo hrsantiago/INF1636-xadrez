@@ -5,10 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import util.Emitter;
+import core.Piece.Color;
 
 public class Game extends Emitter {
 	private static Game m_instance = null;
-	private Piece.Color m_playerTurnColor;
+	private Color m_playerTurnColor;
 	
 	private Board m_board;
 	
@@ -24,13 +25,13 @@ public class Game extends Emitter {
 	
 	public void create() {
 		m_board = new Board(8, 8);
-		m_playerTurnColor = Piece.Color.WHITE;
+		m_playerTurnColor = Color.WHITE;
 		
 		emit("onCreate");
 	}
 	
 	public void serialize(FileOutputStream out) throws IOException {
-		if(m_playerTurnColor == Piece.Color.WHITE)
+		if(m_playerTurnColor == Color.WHITE)
 			out.write(0);
 		else
 			out.write(1);
@@ -42,12 +43,18 @@ public class Game extends Emitter {
 	public void unserialize(FileInputStream in) throws IOException {
 		int color = in.read();
 		if(color == 0)
-			m_playerTurnColor = Piece.Color.WHITE;
+			m_playerTurnColor = Color.WHITE;
 		else
-			m_playerTurnColor = Piece.Color.BLACK;
+			m_playerTurnColor = Color.BLACK;
 		
 		m_board.unserialize(in);
 		emit("onUnserialize");
+	}
+	
+	public void processTileClick(int x, int y) {
+		if(m_board.processTileClick(x, y, m_playerTurnColor)) {
+			m_playerTurnColor = (m_playerTurnColor == Color.WHITE) ? Color.BLACK : Color.WHITE;
+		}
 	}
 	
 	public Board getBoard() {

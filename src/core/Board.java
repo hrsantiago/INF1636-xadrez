@@ -12,6 +12,7 @@ public class Board extends Emitter {
 	private int m_height;
 	private Piece m_pieces[][];
 	private Piece m_selectedPiece;
+	private boolean ignorePlayerTurn = true;
 	
 	public Board(int width, int height) {
 		m_width = width;
@@ -47,11 +48,11 @@ public class Board extends Emitter {
 			for(int j = 0; j < m_width; ++j) {
 				Piece piece = m_pieces[i][j];
 				if(piece != null) {
-					Piece.Color color = piece.getColor();
+					Color color = piece.getColor();
 					out.write(1);
 					out.write(j);
 					out.write(i);
-					out.write(color == Piece.Color.WHITE ? 0 : 1);
+					out.write(color == Color.WHITE ? 0 : 1);
 					
 					if(piece.isPawn())
 						out.write(0);
@@ -86,7 +87,7 @@ public class Board extends Emitter {
 				int colorCode = in.read();
 				int pieceCode = in.read();
 				
-				Piece.Color color = (colorCode == 0) ? Piece.Color.WHITE : Piece.Color.BLACK;
+				Piece.Color color = (colorCode == 0) ? Color.WHITE : Color.BLACK;
 				Piece piece = null;
 				if(pieceCode == 0)
 					piece = new Pawn(x, y, color);
@@ -130,9 +131,12 @@ public class Board extends Emitter {
 		return m_selectedPiece;
 	}
 	
-	public void processTileClick(int x, int y) {
+	public boolean processTileClick(int x, int y, Color playerColor) {
+		boolean moved = false;
 		if(m_selectedPiece == null) {
-			m_selectedPiece = m_pieces[y][x];
+			Piece piece = m_pieces[y][x];
+			if(ignorePlayerTurn || (piece != null && piece.getColor() == playerColor))
+				m_selectedPiece = piece;
 		}
 		else {
 			if(m_selectedPiece.getX() != x || m_selectedPiece.getY() != y) {
@@ -142,22 +146,40 @@ public class Board extends Emitter {
 						m_selectedPiece = piece;
 					else if(!movePiece(m_selectedPiece, x, y))
 						m_selectedPiece = null;
+					else
+						moved = true;
 						
 				}
 				else if(!movePiece(m_selectedPiece, x, y))
 					m_selectedPiece = null;
+				else
+					moved = true;
 			}
 			else
 				m_selectedPiece = null;
 		}
+		
+		if(moved && !ignorePlayerTurn)
+			m_selectedPiece = null;
+		
 		emit("onTileClicked", x, y);
+		return moved;
 	}
 	
 	public boolean movePiece(Piece piece, int x, int y) {
-		if(piece.checkMove(m_pieces, x, y)) {
+		if(piece.checkMove(m_pieces, x, y) || piece.checkCapture(m_pieces, x, y, false)) {
 			m_pieces[piece.getY()][piece.getX()] = null;
 			m_pieces[y][x] = piece;
 			piece.move(x, y);
+			
+			if(piece.isPawn()) {
+				Pawn pawn = (Pawn)piece;
+				if(pawn.canPromote()) {
+					m_pieces[y][x] = new Queen(x, y, piece.getColor());
+					m_selectedPiece = null;
+				}
+			}
+			
 			return true;
 		}
 		return false;
@@ -174,7 +196,7 @@ public class Board extends Emitter {
 						   Math.abs(piece.getY()-y) <= 1 && Math.abs(callerPiece.getY()-y) <= 1)
 						return true;
 					}
-					else if(piece.checkMove(m_pieces, x, y))
+					else if(piece.checkCapture(m_pieces, x, y, true))
 						return true;
 				}
 			}

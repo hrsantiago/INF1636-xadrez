@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,11 +24,19 @@ public class Window extends JFrame {
 	private static final long serialVersionUID = -3739008754324139579L;
 
 	public Window() {
-		setSize(320, 320);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+		setupWindow();
 		setupMenu();
 		getContentPane().add(new BoardView());
+	}
+	
+	private void setupWindow() {
+		setSize(320, 320);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+	    int x = (int) ((dimension.getWidth() - getWidth()) / 2);
+	    int y = (int) ((dimension.getHeight() - getHeight()) / 2);
+	    setLocation(x, y);
 	}
 
 	private void setupMenu() {

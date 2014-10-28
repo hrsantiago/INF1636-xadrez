@@ -55,7 +55,7 @@ public class BoardView extends JPanel {
 				
 				int tileX = (x - x0) / tileWidth;
 				int tileY = (y - y0) / tileHeight;				
-				board.processTileClick(tileX, tileY);
+				game.processTileClick(tileX, tileY);
 			}
 			@Override
 			public void mouseEntered(MouseEvent arg0) {}
@@ -140,7 +140,7 @@ public class BoardView extends JPanel {
 				int y = y0 + i * tileHeight;
 				Piece piece = board.getPiece(i, j);
 				
-				if(selectedPiece != null && selectedPiece.checkMove(board.getPieces(), j, i)) {
+				if(selectedPiece != null && (selectedPiece.checkMove(board.getPieces(), j, i) || selectedPiece.checkCapture(board.getPieces(), j, i, false))) {
 					g2.setColor(Color.YELLOW);
 					g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
 				}

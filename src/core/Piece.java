@@ -51,6 +51,10 @@ public abstract class Piece {
 		return true;
 	}
 	
+	public boolean checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) {
+		return checkMove(pieces, x, y);
+	}
+	
 	public int getX() {
 		return m_x;
 	}
