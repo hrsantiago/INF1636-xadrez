@@ -10,11 +10,31 @@ public abstract class Piece {
 	protected int m_x;
 	protected int m_y;
 	protected Color m_color;
+	protected boolean m_hasMoved = false;
 
 	public Piece(int x, int y, Color color) {
 		m_x = x;
 		m_y = y;
 		m_color = color;
+	}
+	
+	public Piece clone() {
+		Piece piece = null;
+		if(isKing())
+			piece = new King(m_x, m_y, m_color);
+		else if(isQueen())
+			piece = new Queen(m_x, m_y, m_color);
+		else if(isKnight())
+			piece = new Knight(m_x, m_y, m_color);
+		else if(isBishop())
+			piece = new Bishop(m_x, m_y, m_color);
+		else if(isRook())
+			piece = new Rook(m_x, m_y, m_color);
+		else if(isPawn())
+			piece = new Pawn(m_x, m_y, m_color);
+		
+		piece.setHasMoved(m_hasMoved);
+		return piece;
 	}
 	
 	public boolean isKing() { return false; }
@@ -63,8 +83,29 @@ public abstract class Piece {
 		return m_y;
 	}
 	
+	public Position getPosition() {
+		return new Position(m_x, m_y);
+	}
+	
+	public void setX(int x) {
+		m_x = x;
+	}
+	
+	public void setY(int y) {
+		m_y = y;
+	}
+	
+	public boolean hasMoved() {
+		return m_hasMoved;
+	}
+	
+	public void setHasMoved(boolean hasMoved) {
+		m_hasMoved = hasMoved;
+	}
+	
 	public void move(int x, int y) {
 		m_x = x;
 		m_y = y;
+		m_hasMoved = true;
 	}
 }

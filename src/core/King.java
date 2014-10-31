@@ -22,8 +22,34 @@ public class King extends Piece {
 				return false;
 		}
 
-		if (Math.abs(m_x - x) > 1 || Math.abs(m_y - y) > 1)
+		if (Math.abs(m_x - x) > 2 || Math.abs(m_y - y) > 1)
 			return false;
+		
+		// Castling
+		if(Math.abs(m_x - x) == 2) {
+			if(m_y != y)
+				return false;
+			if(m_hasMoved)
+				return false;
+			
+			Piece rook = null;
+			if(x == m_x + 2) {
+				for(int j = m_x + 1; j <= m_x + 2; ++j)
+					if(pieces[m_y][j] != null)
+						return false;
+				rook = pieces[m_y][m_x + 3];
+			}
+			else if(x == m_x - 2) {
+				for(int j = m_x - 1; j >= m_x - 3; --j)
+					if(pieces[m_y][j] != null)
+						return false;
+				rook = pieces[m_y][m_x - 4];
+			}
+			
+			if(rook == null || rook.hasMoved())
+				return false;
+		}
+		
 
 		Game game = Game.getInstance();
 		Board board = game.getBoard();

@@ -1,9 +1,11 @@
 package view;
 
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -72,6 +75,18 @@ public class Window extends JFrame {
 		fileMenu.add(openAction);
 		fileMenu.add(saveAction);
 		fileMenu.add(exitAction);
+		
+		JMenu editMenu = new JMenu("Edit");
+		menuBar.add(editMenu);
+		
+		JMenuItem undoAction = new JMenuItem("Undo");
+		undoAction.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
+		undoAction.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) { onUndoClicked(); }
+		});
+		
+		editMenu.add(undoAction);
 	}
 
 	private void onNewClicked() {
@@ -129,5 +144,10 @@ public class Window extends JFrame {
 
 	private void onExitClicked() {
 		System.exit(0);
+	}
+	
+	private void onUndoClicked() {
+		Game game = Game.getInstance();
+		game.undo();
 	}
 }

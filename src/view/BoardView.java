@@ -2,6 +2,8 @@ package view;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -18,6 +20,7 @@ import javax.swing.JPanel;
 import core.Board;
 import core.Game;
 import core.Piece;
+import core.Position;
 
 public class BoardView extends JPanel {
 
@@ -72,13 +75,12 @@ public class BoardView extends JPanel {
 		Game game = Game.getInstance();
 		game.connect("onCreate", this, "onGameCreated");
 		game.connect("onUnserialize", this, "onGameUnserialize");
+		game.connect("onTileClicked", this, "onTileClicked");
+		game.connect("onUndo", this, "onUndo");
 		onGameCreated();
 	}
 	
 	public void onGameCreated() {
-		Game game = Game.getInstance();
-		Board board = game.getBoard();
-		board.connect("onTileClicked", this, "onTileClicked");
 		repaint();
 	}
 	
@@ -89,6 +91,10 @@ public class BoardView extends JPanel {
 	public void onTileClicked(int x, int y) {
 		repaint();
 	}
+	
+	public void onUndo() {
+		repaint();
+	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponents(g);
@@ -96,6 +102,18 @@ public class BoardView extends JPanel {
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
 		paintBoard(g, board);
+		
+		if(game.hasFinished()) {
+			String text = "Game Over";
+			Font font = new Font("Verdana", Font.BOLD, 40);
+			g.setColor(Color.RED);
+			g.setFont(font);
+			FontMetrics fm = getFontMetrics(font);
+			int width = fm.stringWidth(text);
+			int x = (getWidth() - width) / 2;
+			int y = (getHeight()) / 2;
+			g.drawString(text, x, y);
+		}
 	}
 
 	private void paintBoard(Graphics g, Board board) {
@@ -133,20 +151,20 @@ public class BoardView extends JPanel {
 		
 		g2.setStroke(new BasicStroke(lw));
 		
-		Piece selectedPiece = board.getSelectedPiece();
+		Position selectedPosition = board.getSelectedPosition();
 		for(int i = 0; i < board.getHeight(); ++i) {
 			for(int j = 0; j < board.getWidth(); ++j) {
 				int x = x0 + j * tileWidth;
 				int y = y0 + i * tileHeight;
 				Piece piece = board.getPiece(i, j);
 				
-				if(selectedPiece != null && (selectedPiece.checkMove(board.getPieces(), j, i) || selectedPiece.checkCapture(board.getPieces(), j, i, false))) {
+				if(selectedPosition != null && board.checkMovePiece(selectedPosition, j, i)) {
 					g2.setColor(Color.YELLOW);
 					g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
 				}
 				
 				if(piece != null) {
-					if(piece == selectedPiece) {
+					if(selectedPosition != null && piece.getX() == selectedPosition.x && piece.getY() == selectedPosition.y) {
 						g2.setColor(Color.RED);
 						g2.drawRect(x + lw/2, y + lw/2, tileWidth - lw, tileHeight - lw);
 					}	

@@ -2,8 +2,6 @@ package core;
 
 public class Pawn extends Piece {
 
-	boolean m_first = true;
-
 	public Pawn(int x, int y, Color color) {
 		super(x, y, color);
 	}
@@ -14,15 +12,6 @@ public class Pawn extends Piece {
 		else if (getColor() == Color.BLACK && getY() == 7)
 			return true;
 		return false;
-	}
-
-	public boolean isFirst() {
-		return m_first;
-	}
-
-	public void move(int x, int y) {
-		super.move(x, y);
-		m_first = false;
 	}
 
 	public boolean isPawn() {
@@ -41,32 +30,21 @@ public class Pawn extends Piece {
 		if (otherPiece != null)
 			return false;
 
-		if (m_first) {
+		if (!m_hasMoved) {
 			if (m_color == Color.BLACK) {
-				if (getY() + 1 == y) {
+				if (getY() + 1 == y)
 					return true;
-
-				} else if (getY() + 2 == y) {
-					if (pieces[y - 1][x] != null) {
-						return false;
-					} else {
-						return true;
-					}
-				}
+				else if (getY() + 2 == y)
+					return pieces[y - 1][x] == null;
 			}
 			if (m_color == Color.WHITE) {
-				if (getY() - 1 == y) {
+				if (getY() - 1 == y)
 					return true;
-
-				} else if (getY() - 2 == y) {
-					if (pieces[y + 1][x] != null) {
-						return false;
-					} else {
-						return true;
-					}
-				}
+				else if (getY() - 2 == y)
+					return pieces[y + 1][x] == null;
 			}
-		} else {
+		}
+		else {
 			if (m_color == Color.BLACK && getY() + 1 == y)
 				return true;
 			if (m_color == Color.WHITE && getY() - 1 == y)

@@ -3,21 +3,24 @@ package core;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
-import util.Emitter;
 import core.Piece.Color;
 
-public class Board extends Emitter {
+public class Board {
+	
 	private int m_width;
 	private int m_height;
 	private Piece m_pieces[][];
-	private Piece m_selectedPiece;
-	private boolean ignorePlayerTurn = true;
+	private Position m_selectedPosition;
+	private boolean ignorePlayerTurn = false;
+	private Vector<Move> m_moves;
 	
 	public Board(int width, int height) {
 		m_width = width;
 		m_height = height;
 		m_pieces = new Piece[height][width];
+		m_moves = new Vector<Move>();
 		initialize();
 	}
 	
@@ -40,7 +43,7 @@ public class Board extends Emitter {
 				m_pieces[pawnRow][j] = new Pawn(j, pawnRow, color);
 		}
 		
-		m_selectedPiece = null;
+		m_selectedPosition = null;
 	}
 	
 	public void serialize(FileOutputStream out) throws IOException {
@@ -76,6 +79,7 @@ public class Board extends Emitter {
 	
 	public void unserialize(FileInputStream in) throws IOException {
 		m_pieces = new Piece[m_height][m_width];
+		m_moves = new Vector<Move>();
 		
 		int code;
 		while((code = in.read()) != -1) {
@@ -127,62 +131,130 @@ public class Board extends Emitter {
 		return m_pieces;
 	}
 	
+	public Position getSelectedPosition() {
+		return m_selectedPosition;
+	}
+	
 	public Piece getSelectedPiece() {
-		return m_selectedPiece;
+		if(m_selectedPosition != null)
+			return m_pieces[m_selectedPosition.y][m_selectedPosition.x];
+		return null;
 	}
 	
 	public boolean processTileClick(int x, int y, Color playerColor) {
 		boolean moved = false;
-		if(m_selectedPiece == null) {
+		Piece selectedPiece = getSelectedPiece();
+		if(selectedPiece == null) {
 			Piece piece = m_pieces[y][x];
-			if(ignorePlayerTurn || (piece != null && piece.getColor() == playerColor))
-				m_selectedPiece = piece;
+			if(piece != null && (ignorePlayerTurn || piece.getColor() == playerColor))
+				m_selectedPosition = piece.getPosition();
 		}
 		else {
-			if(m_selectedPiece.getX() != x || m_selectedPiece.getY() != y) {
+			if(selectedPiece.getX() != x || selectedPiece.getY() != y) {
 				Piece piece = m_pieces[y][x];
 				if(piece != null) {
-					if(piece.getColor() == m_selectedPiece.getColor())
-						m_selectedPiece = piece;
-					else if(!movePiece(m_selectedPiece, x, y))
-						m_selectedPiece = null;
+					if(piece.getColor() == selectedPiece.getColor())
+						m_selectedPosition = piece.getPosition();
+					else if(!movePiece(m_selectedPosition, x, y))
+						m_selectedPosition = null;
 					else
 						moved = true;
-						
 				}
-				else if(!movePiece(m_selectedPiece, x, y))
-					m_selectedPiece = null;
+				else if(!movePiece(m_selectedPosition, x, y))
+					m_selectedPosition = null;
 				else
 					moved = true;
 			}
 			else
-				m_selectedPiece = null;
+				m_selectedPosition = null;
 		}
 		
-		if(moved && !ignorePlayerTurn)
-			m_selectedPiece = null;
+		if(moved && ignorePlayerTurn)
+			m_selectedPosition = new Position(x, y);
 		
-		emit("onTileClicked", x, y);
+		if(moved && !ignorePlayerTurn)
+			m_selectedPosition = null;
+		
 		return moved;
 	}
 	
-	public boolean movePiece(Piece piece, int x, int y) {
-		if(piece.checkMove(m_pieces, x, y) || piece.checkCapture(m_pieces, x, y, false)) {
-			m_pieces[piece.getY()][piece.getX()] = null;
-			m_pieces[y][x] = piece;
-			piece.move(x, y);
+	public boolean movePiece(Position from, int x, int y) {
+		Piece piece = m_pieces[from.y][from.x];
+		if(piece != null && (piece.checkMove(m_pieces, x, y) || piece.checkCapture(m_pieces, x, y, false))) {
 			
+			internalMove(piece.getPosition(), new Position(x, y), false);
+			
+			// Special moves
 			if(piece.isPawn()) {
 				Pawn pawn = (Pawn)piece;
-				if(pawn.canPromote()) {
+				if(pawn.canPromote())
 					m_pieces[y][x] = new Queen(x, y, piece.getColor());
-					m_selectedPiece = null;
+			}
+			
+			if(piece.isKing()) {
+				if(x == from.x + 2) {
+					Piece rook = getPiece(from.y, from.x + 3);
+					internalMove(rook.getPosition(), new Position(from.x + 1, from.y), true);
+				}
+				else if(x == from.x - 2) {
+					Piece rook = getPiece(from.y, from.x - 4);
+					internalMove(rook.getPosition(), new Position(from.x - 1, from.y), true);
 				}
 			}
 			
+			// Well, in fact we cant move cause this will get the king in check
+			Piece king = getKing(piece.getColor());
+			if(king != null && king.isChecked()) {
+				undo();
+				return false;
+			}
+				
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean checkMovePiece(Position from, int x, int y) {
+		if(movePiece(from, x, y)) {
+			undo();
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean playerHasMoves(Color color) {
+		for(int i = 0; i < m_height; ++i) {
+			for(int j = 0; j < m_width; ++j) {
+				Piece piece = m_pieces[i][j];
+				if(piece != null && piece.getColor() == color) {
+					if(pieceHasMoves(piece))
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean pieceHasMoves(Piece piece) {
+		Position position = piece.getPosition();
+		for(int i = 0; i < m_height; ++i) {
+			for(int j = 0; j < m_width; ++j) {
+				if(checkMovePiece(position, j, i))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	public Piece getKing(Color color) {
+		for(int i = 0; i < m_height; ++i) {
+			for(int j = 0; j < m_width; ++j) {
+				Piece piece = m_pieces[i][j];
+				if(piece != null && piece.isKing() && piece.getColor() == color)
+					return piece;
+			}
+		}
+		return null;
 	}
 	
 	public boolean isTileChecked(int x, int y, Color checkerColor, Piece callerPiece) {
@@ -202,5 +274,39 @@ public class Board extends Emitter {
 			}
 		}
 		return false;
+	}
+	
+	public boolean undo() {
+		if(m_moves.size() == 0)
+			return false;
+		
+		Move move = null;
+		do {
+			move = m_moves.lastElement();
+			Piece fromPiece = move.getFrom();
+			Piece toPiece = move.getTo();
+			Position fromPos = move.getFromPosition();
+			Position toPos = move.getToPosition();
+			
+			m_pieces[toPos.y][toPos.x] = toPiece;
+			m_pieces[fromPos.y][fromPos.x] = fromPiece;
+			
+			m_moves.remove(m_moves.size() - 1);
+		} while(move.isLinked());
+		return true;
+	}
+	
+	private void internalMove(Position from, Position to, boolean linked) {
+		Piece fromPiece = m_pieces[from.y][from.x];
+		Piece toPiece = m_pieces[to.y][to.x];
+		
+		Move move = new Move(fromPiece, toPiece, linked);
+		move.setFromPosition(from);
+		move.setToPosition(to);
+		m_moves.add(move);
+		
+		fromPiece.move(to.x, to.y);
+		m_pieces[to.y][to.x] = fromPiece;
+		m_pieces[from.y][from.x] = null;
 	}
 }

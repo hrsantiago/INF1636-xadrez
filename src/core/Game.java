@@ -10,6 +10,7 @@ import core.Piece.Color;
 public class Game extends Emitter {
 	private static Game m_instance = null;
 	private Color m_playerTurnColor;
+	private boolean m_finished;
 	
 	private Board m_board;
 	
@@ -26,6 +27,7 @@ public class Game extends Emitter {
 	public void create() {
 		m_board = new Board(8, 8);
 		m_playerTurnColor = Color.WHITE;
+		m_finished = false;
 		
 		emit("onCreate");
 	}
@@ -51,13 +53,31 @@ public class Game extends Emitter {
 		emit("onUnserialize");
 	}
 	
-	public void processTileClick(int x, int y) {
-		if(m_board.processTileClick(x, y, m_playerTurnColor)) {
+	public void undo() {
+		if(m_board.undo()) {
+			m_finished = false;
 			m_playerTurnColor = (m_playerTurnColor == Color.WHITE) ? Color.BLACK : Color.WHITE;
+			emit("onUndo");
 		}
+	}
+	
+	public void processTileClick(int x, int y) {
+		if(!m_finished) {
+			if(m_board.processTileClick(x, y, m_playerTurnColor)) {
+				m_playerTurnColor = (m_playerTurnColor == Color.WHITE) ? Color.BLACK : Color.WHITE;
+			
+				if(!m_board.playerHasMoves(m_playerTurnColor))
+					m_finished = true;
+			}
+		}
+		emit("onTileClicked", x, y);
 	}
 	
 	public Board getBoard() {
 		return m_board;
+	}
+	
+	public boolean hasFinished() {
+		return m_finished;
 	}
 }
