@@ -31,15 +31,16 @@ public class Window extends JFrame {
 		setupMenu();
 		getContentPane().add(new BoardView());
 	}
-	
+
 	private void setupWindow() {
-		setSize(320, 320);
+		setSize(500, 540);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
+		setResizable(false);
+
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-	    int x = (int) ((dimension.getWidth() - getWidth()) / 2);
-	    int y = (int) ((dimension.getHeight() - getHeight()) / 2);
-	    setLocation(x, y);
+		int x = (int) ((dimension.getWidth() - getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - getHeight()) / 2);
+		setLocation(x, y);
 	}
 
 	private void setupMenu() {
@@ -75,17 +76,17 @@ public class Window extends JFrame {
 		fileMenu.add(openAction);
 		fileMenu.add(saveAction);
 		fileMenu.add(exitAction);
-		
+
 		JMenu editMenu = new JMenu("Edit");
 		menuBar.add(editMenu);
-		
+
 		JMenuItem undoAction = new JMenuItem("Undo");
 		undoAction.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK));
 		undoAction.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) { onUndoClicked(); }
 		});
-		
+
 		editMenu.add(undoAction);
 	}
 
@@ -96,11 +97,11 @@ public class Window extends JFrame {
 
 	private void onOpenClicked() {
 		JFileChooser fc = new JFileChooser();
-		
+
 		FileFilter filter = new FileNameExtensionFilter("Chess file (*.chess)", "chess");
 		fc.addChoosableFileFilter(filter);
 		fc.setFileFilter(filter);
-		
+
 		int returnVal = fc.showOpenDialog(Window.this);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
@@ -118,18 +119,18 @@ public class Window extends JFrame {
 
 	private void onSaveClicked() {
 		JFileChooser fc = new JFileChooser();
-		
+
 		FileFilter filter = new FileNameExtensionFilter("Chess file (*.chess)", "chess");
 		fc.addChoosableFileFilter(filter);
 		fc.setFileFilter(filter);
-		
+
 		int returnVal = fc.showSaveDialog(Window.this);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
 			String fileName = file.getAbsolutePath();
 			if(!fileName.endsWith(".chess"))
-                file = new File(fileName + ".chess");
-                
+				file = new File(fileName + ".chess");
+
 			try {
 				FileOutputStream out = new FileOutputStream(file);
 				Game game = Game.getInstance();
@@ -145,7 +146,7 @@ public class Window extends JFrame {
 	private void onExitClicked() {
 		System.exit(0);
 	}
-	
+
 	private void onUndoClicked() {
 		Game game = Game.getInstance();
 		game.undo();
