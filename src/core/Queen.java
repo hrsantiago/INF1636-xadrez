@@ -10,41 +10,40 @@ public class Queen extends Piece {
 		return true;
 	}
 
-	public boolean checkMove(Piece pieces[][], int x, int y) {
-		if (!super.checkMove(pieces, x, y))
-			return false;
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException {
+		super.checkMove(pieces, x, y);
 
 		Piece otherPiece = pieces[y][x];
 		if (otherPiece != null && otherPiece.getColor() == m_color)
-			return false;
+			throw new MoveException("Invalid move");
 
 		if (getX() == x && getY() != y) {
 			if (y > getY()) {
 				for (int i = getY() + 1; i < y; i++) {
 					if (pieces[i][x] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			} else {
 				for (int i = getY() - 1; i > y; i--) {
 					if (pieces[i][x] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
-			return true;
+			return;
 		}
 		if (getY() == y && getX() != x) {
 			if (x > getX()) {
 				for (int i = getX() + 1; i < x; i++) {
 					if (pieces[y][i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			} else {
 				for (int i = getX() - 1; i > x; i--) {
 					if (pieces[y][i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
-			return true;
+			return;
 		}
 
 		if (Math.abs(getX() - x) == Math.abs(getY() - y)) {
@@ -52,30 +51,30 @@ public class Queen extends Piece {
 				if (y > getY()) {
 					for (int i = 1; i < Math.abs(getX() - x); i++) {
 						if (pieces[getY() + i][getX() + i] != null)
-							return false;
+							throw new MoveException("Invalid move");
 					}
 				} else { // y<getY()
 					for (int i = 1; i < Math.abs(getX() - x); i++) {
 						if (pieces[getY() - i][getX() + i] != null)
-							return false;
+							throw new MoveException("Invalid move");
 					}
 				}
 			} else {
 				if (y > getY()) {
 					for (int i = 1; i < Math.abs(getX() - x); i++) {
 						if (pieces[getY() + i][getX() - i] != null)
-							return false;
+							throw new MoveException("Invalid move");
 
 					}
 				} else { // y<getY()
 					for (int i = 1; i < Math.abs(getX() - x); i++) {
 						if (pieces[getY() - i][getX() - i] != null)
-							return false;
+							throw new MoveException("Invalid move");
 					}
 				}
 			}
-			return true;
+			return;
 		}
-		return false;
+		throw new MoveException("Invalid move");
 	}
 }

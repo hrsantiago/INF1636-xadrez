@@ -7,28 +7,27 @@ public class Bishop extends Piece {
 	}
 
 	public boolean isBishop() { return true; }
-	public boolean checkMove(Piece pieces[][], int x, int y) {
-		if(!super.checkMove(pieces, x, y))
-			return false;
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException {
+		super.checkMove(pieces, x, y);
 
 		Piece otherPiece = pieces[y][x];
 		if(otherPiece != null && otherPiece.getColor() == m_color)
-			return false;
+			throw new MoveException("Invalid move");
 
 		if(Math.abs(getX()-x) != Math.abs(getY()-y))
-			return false;
+			throw new MoveException("Invalid move");
 
 		if(x > getX()) {
 			if(y > getY()) {
 				for(int i = 1; i < Math.abs(getX()-x); i++) {
 					if(pieces[getY()+i][getX()+i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
 			else {		//y<getY()
 				for(int i = 1; i < Math.abs(getX()-x); i++) {
 					if(pieces[getY()-i][getX()+i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
 		}
@@ -36,16 +35,15 @@ public class Bishop extends Piece {
 			if(y > getY()) {
 				for(int i = 1;i < Math.abs(getX()-x); i++) {
 					if(pieces[getY()+i][getX()-i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
 			else {		//y<getY()
 				for(int i = 1; i < Math.abs(getX()-x); i++) {
 					if(pieces[getY()-i][getX()-i] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				}
 			}
 		}
-		return true;
 	}
 }

@@ -8,20 +8,19 @@ public class Knight extends Piece {
 	
 	public boolean isKnight() { return true; }
 	
-	public boolean checkMove(Piece pieces[][], int x, int y)
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException
 	{
-		if(!super.checkMove(pieces, x, y))
-			return false;
+		super.checkMove(pieces, x, y);
 		
 		Piece otherPiece = pieces[y][x];
 		if(otherPiece != null && otherPiece.getColor() == m_color)
-			return false;
+			throw new MoveException("Invalid move");
 		
 		if(Math.abs(m_x - x) == 2 && Math.abs(m_y - y) == 1)
-			return true;
+			return;
 		if(Math.abs(m_x - x) == 1 && Math.abs(m_y - y) == 2)
-			return true;
+			return;
 		
-		return false;
+		throw new MoveException("Invalid move");
 	}
 }

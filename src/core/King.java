@@ -10,54 +10,50 @@ public class King extends Piece {
 		return true;
 	}
 
-	public boolean checkMove(Piece pieces[][], int x, int y) {
-		if (!super.checkMove(pieces, x, y))
-			return false;
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException {
+		super.checkMove(pieces, x, y);
 
 		Piece otherPiece = pieces[y][x];
 		if (otherPiece != null) {
 			if (otherPiece.getColor() == m_color)
-				return false;
+				throw new MoveException("Invalid move");
 			if (otherPiece.isKing())
-				return false;
+				throw new MoveException("Invalid move");
 		}
 
 		if (Math.abs(m_x - x) > 2 || Math.abs(m_y - y) > 1)
-			return false;
-		
+			throw new MoveException("Invalid move");
+
 		// Castling
 		if(Math.abs(m_x - x) == 2) {
 			if(m_y != y)
-				return false;
+				throw new MoveException("Invalid move");
 			if(hasMoved())
-				return false;
-			
+				throw new MoveException("Invalid move");
+
 			Piece rook = null;
 			if(x == m_x + 2) {
 				for(int j = m_x + 1; j <= m_x + 2; ++j)
 					if(pieces[m_y][j] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				rook = pieces[m_y][m_x + 3];
 			}
 			else if(x == m_x - 2) {
 				for(int j = m_x - 1; j >= m_x - 3; --j)
 					if(pieces[m_y][j] != null)
-						return false;
+						throw new MoveException("Invalid move");
 				rook = pieces[m_y][m_x - 4];
 			}
-			
+
 			if(rook == null || rook.hasMoved())
-				return false;
+				throw new MoveException("Invalid move");
 		}
-		
 
 		Game game = Game.getInstance();
 		Board board = game.getBoard();
 
 		// This function is slow, so it should be the last check.
 		if (board.isTileChecked(x, y, getEnemyColor(), this))
-			return false;
-
-		return true;
+			throw new MoveException("Invalid move");
 	}
 }

@@ -61,18 +61,16 @@ public abstract class Piece {
 			return Color.WHITE;
 	}
 	
-	public boolean checkMove(Piece pieces[][], int x, int y) {
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException {
 		if(x < 0 || x >= 8 || y < 0 || y >= 8)
-			return false;
+			throw new MoveException("Out of bounds");
 		
 		if(m_x == x && m_y == y)
-			return false;
-		
-		return true;
+			throw new MoveException("Cant move to same position");
 	}
 	
-	public boolean checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) {
-		return checkMove(pieces, x, y);
+	public void checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) throws MoveException {
+		checkMove(pieces, x, y);
 	}
 	
 	public int getX() {

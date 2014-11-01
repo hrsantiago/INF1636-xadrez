@@ -180,7 +180,17 @@ public class Board {
 	
 	public boolean movePiece(Position from, int x, int y) {
 		Piece piece = m_pieces[from.y][from.x];
-		if(piece != null && (piece.checkMove(m_pieces, x, y) || piece.checkCapture(m_pieces, x, y, false))) {
+		if(piece != null) {
+			try {
+				piece.checkMove(m_pieces, x, y);
+			} catch (MoveException e) {
+				try {
+					piece.checkCapture(m_pieces, x, y, false);
+				} catch (MoveException e1) {
+					return false;
+				}
+			}
+
 			Piece toPiece = m_pieces[y][x];
 			
 			internalMove(piece.getPosition(), new Position(x, y), false);
@@ -276,8 +286,15 @@ public class Board {
 						   Math.abs(piece.getY()-y) <= 1 && Math.abs(callerPiece.getY()-y) <= 1)
 						return true;
 					}
-					else if(piece.checkCapture(m_pieces, x, y, true))
-						return true;
+					else {
+						try {
+							piece.checkCapture(m_pieces, x, y, true);
+							return true;
+						} catch (MoveException e) {
+						}
+						
+					}
+						
 				}
 			}
 		}

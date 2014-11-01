@@ -18,44 +18,50 @@ public class Pawn extends Piece {
 		return true;
 	}
 
-	public boolean checkMove(Piece pieces[][], int x, int y) {
-		if (!super.checkMove(pieces, x, y))
-			return false;
+	public void checkMove(Piece pieces[][], int x, int y) throws MoveException {
+		super.checkMove(pieces, x, y);
 
 		if (getX() != x)
-			return false;
+			throw new MoveException("Invalid move");
 		
 		Piece otherPiece = pieces[y][x];
 		if (otherPiece != null)
-			return false;
+			throw new MoveException("Invalid move");
 
 		if (!hasMoved()) {
 			if (m_color == Color.BLACK) {
 				if (getY() + 1 == y)
-					return true;
-				else if (getY() + 2 == y)
-					return pieces[y - 1][x] == null;
+					return;
+				else if (getY() + 2 == y) {
+					if(pieces[y - 1][x] == null)
+						return;
+					else
+						throw new MoveException("Invalid move");
+				}
 			}
 			if (m_color == Color.WHITE) {
 				if (getY() - 1 == y)
-					return true;
-				else if (getY() - 2 == y)
-					return pieces[y + 1][x] == null;
+					return;
+				else if (getY() - 2 == y) {
+					if(pieces[y + 1][x] == null)
+						return;
+					else
+						throw new MoveException("Invalid move");
+				}
 			}
 		}
 		else {
 			if (m_color == Color.BLACK && getY() + 1 == y)
-				return true;
+				return;
 			if (m_color == Color.WHITE && getY() - 1 == y)
-				return true;
+				return;
 		}
 		
-		return false;
+		throw new MoveException("Invalid move");
 	}
 
-	public boolean checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) {
-		if (!super.checkMove(pieces, x, y))
-			return false;
+	public void checkCapture(Piece pieces[][], int x, int y, boolean ignorePiece) throws MoveException {
+		super.checkMove(pieces, x, y);
 		
 		// En passant
 		Piece pawn = null;
@@ -72,25 +78,22 @@ public class Pawn extends Piece {
 				pawn = pieces[m_y][m_x + 1];
 		}
 		if(pawn != null && pawn.isPawn() && pawn.getColor() != m_color && pawn.getMoveCount() == 1)
-			return true;
+			return;
 		
 		if (m_color == Color.BLACK && getY() + 1 != y)
-			return false;
+			throw new MoveException("Invalid move");
 		if (m_color == Color.WHITE && getY() - 1 != y)
-			return false;
+			throw new MoveException("Invalid move");
 		
 		if (Math.abs(m_x - x) != 1)
-			return false;
+			throw new MoveException("Invalid move");
 
 		if(!ignorePiece) {
 			Piece otherPiece = pieces[y][x];
 			if (otherPiece == null)
-				return false;
-	
+				throw new MoveException("Invalid move");
 			if (m_color == otherPiece.getColor())
-				return false;
+				throw new MoveException("Invalid move");
 		}
-
-		return true;
 	}
 }
