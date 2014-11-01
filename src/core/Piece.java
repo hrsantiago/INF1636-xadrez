@@ -10,7 +10,7 @@ public abstract class Piece {
 	protected int m_x;
 	protected int m_y;
 	protected Color m_color;
-	protected boolean m_hasMoved = false;
+	protected int m_moveCount = 0;
 
 	public Piece(int x, int y, Color color) {
 		m_x = x;
@@ -33,7 +33,7 @@ public abstract class Piece {
 		else if(isPawn())
 			piece = new Pawn(m_x, m_y, m_color);
 		
-		piece.setHasMoved(m_hasMoved);
+		piece.setMoveCount(m_moveCount);
 		return piece;
 	}
 	
@@ -96,16 +96,20 @@ public abstract class Piece {
 	}
 	
 	public boolean hasMoved() {
-		return m_hasMoved;
+		return m_moveCount > 0;
 	}
 	
-	public void setHasMoved(boolean hasMoved) {
-		m_hasMoved = hasMoved;
+	public void setMoveCount(int moveCount) {
+		m_moveCount = moveCount;
+	}
+	
+	public int getMoveCount() {
+		return m_moveCount;
 	}
 	
 	public void move(int x, int y) {
 		m_x = x;
 		m_y = y;
-		m_hasMoved = true;
+		m_moveCount += 1;
 	}
 }

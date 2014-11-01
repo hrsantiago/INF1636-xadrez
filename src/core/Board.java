@@ -181,16 +181,24 @@ public class Board {
 	public boolean movePiece(Position from, int x, int y) {
 		Piece piece = m_pieces[from.y][from.x];
 		if(piece != null && (piece.checkMove(m_pieces, x, y) || piece.checkCapture(m_pieces, x, y, false))) {
+			Piece toPiece = m_pieces[y][x];
 			
 			internalMove(piece.getPosition(), new Position(x, y), false);
 			
 			// Special moves
 			if(piece.isPawn()) {
 				Pawn pawn = (Pawn)piece;
+				
+				// Promotion
 				if(pawn.canPromote())
 					m_pieces[y][x] = new Queen(x, y, piece.getColor());
+				
+				// En passant
+				if(toPiece == null && Math.abs(from.x - x) == 1 && Math.abs(from.y - y) == 1)
+					internalRemove(new Position(x, from.y), true);
 			}
 			
+			// Castling 
 			if(piece.isKing()) {
 				if(x == from.x + 2) {
 					Piece rook = getPiece(from.y, from.x + 3);
@@ -283,14 +291,18 @@ public class Board {
 		Move move = null;
 		do {
 			move = m_moves.lastElement();
-			Piece fromPiece = move.getFrom();
-			Piece toPiece = move.getTo();
+			
 			Position fromPos = move.getFromPosition();
+			if(fromPos != null) {
+				Piece fromPiece = move.getFrom();
+				m_pieces[fromPos.y][fromPos.x] = fromPiece;
+			}
 			Position toPos = move.getToPosition();
-			
-			m_pieces[toPos.y][toPos.x] = toPiece;
-			m_pieces[fromPos.y][fromPos.x] = fromPiece;
-			
+			if(toPos != null) {
+				Piece toPiece = move.getTo();
+				m_pieces[toPos.y][toPos.x] = toPiece;
+			}
+
 			m_moves.remove(m_moves.size() - 1);
 		} while(move.isLinked());
 		return true;
@@ -308,5 +320,15 @@ public class Board {
 		fromPiece.move(to.x, to.y);
 		m_pieces[to.y][to.x] = fromPiece;
 		m_pieces[from.y][from.x] = null;
+	}
+	
+	private void internalRemove(Position position, boolean linked) {
+		Piece piece = m_pieces[position.y][position.x];
+		
+		Move move = new Move(piece, null, linked);
+		move.setFromPosition(position);
+		m_moves.add(move);
+		
+		m_pieces[position.y][position.x] = null;
 	}
 }

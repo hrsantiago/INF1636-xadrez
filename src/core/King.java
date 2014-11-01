@@ -29,7 +29,7 @@ public class King extends Piece {
 		if(Math.abs(m_x - x) == 2) {
 			if(m_y != y)
 				return false;
-			if(m_hasMoved)
+			if(hasMoved())
 				return false;
 			
 			Piece rook = null;
